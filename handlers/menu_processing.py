@@ -14,7 +14,7 @@ from buttons.inline import (
     get_products_btns,
     get_user_cart,
     get_user_catalog_btns,
-    get_user_main_btns,
+    get_user_main_btns, get_user_precart,
 )
 
 from database.orm_queries import Paginator
@@ -87,7 +87,55 @@ async def products(session, level, subcategory, page):
     return image, kbds
 
 
-async def carts(session, level, menu_name, page, user_id, product_id):
+async def precart(session, level, menu_name, page, user_id, product_id):
+    if menu_name == "delete":
+        await orm_delete_from_cart(session, user_id, product_id)
+        if page > 1:
+            page -= 1
+    elif menu_name == "decrement":
+        is_cart = await orm_reduce_product_in_cart(session, user_id, product_id)
+        if page > 1 and not is_cart:
+            page -= 1
+    elif menu_name == "increment":
+        await orm_add_to_cart(session, user_id, product_id)
+
+    carts = await orm_get_user_carts(session, user_id)
+
+    if not carts:
+        banner = await orm_get_banner(session, "cart")
+        image = InputMediaPhoto(
+            media=banner.image, caption=f"<strong>{banner.description}</strong>"
+        )
+
+        kbds = get_user_precart(
+            level=level,
+            page=None,
+            pagination_btns=None,
+            product_id=None,
+        )
+    else:
+        paginator = Paginator(carts, page=page)
+
+        cart = paginator.get_page()[0]
+
+        image = InputMediaPhoto(
+            media=cart.product.image,
+            caption=f"{cart.product.description}\n Товар {paginator.page} из {paginator.pages} в корзине."
+        )
+
+        pagination_btns = pages(paginator)
+
+        kbds = get_user_precart(
+            level=level,
+            page=page,
+            pagination_btns=pagination_btns,
+            product_id=cart.product.id,
+        )
+
+    return image, kbds
+
+
+async def cart(session, level, menu_name, page, user_id, product_id):
     if menu_name == "delete":
         await orm_delete_from_cart(session, user_id, product_id)
         if page > 1:
@@ -153,4 +201,6 @@ async def get_menu_content(
     elif level == 3:
         return await products(session, level, category, page)
     elif level == 4:
-        return await carts(session, level, menu_name, page, user_id, product_id)
+        return await precart(session, level, menu_name, page, user_id, product_id)
+    elif level == 5:
+        return await cart(session, level, menu_name, page, user_id, product_id)
