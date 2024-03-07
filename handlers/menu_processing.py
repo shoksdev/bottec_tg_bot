@@ -8,13 +8,13 @@ from database.orm_queries import (
     orm_get_categories,
     orm_get_products,
     orm_get_user_carts,
-    orm_reduce_product_in_cart, orm_get_subcategories, orm_get_product,
+    orm_reduce_product_in_cart, orm_get_subcategories, orm_get_product, orm_get_questions,
 )
 from buttons.inline import (
     get_products_btns,
     get_user_cart,
     get_user_catalog_btns,
-    get_user_main_btns, get_user_precart,
+    get_user_main_btns, get_user_precart, get_questions_btns,
 )
 
 from database.orm_queries import Paginator
@@ -82,6 +82,28 @@ async def products(session, level, subcategory, page):
         page=page,
         pagination_btns=pagination_btns,
         product_id=product.id,
+    )
+
+    return image, kbds
+
+
+async def questions(session, level, page):
+    questions = await orm_get_questions(session)
+    banner = (await orm_get_banner(session, page='faq'))
+    paginator = Paginator(questions, page=page)
+    question = paginator.get_page()[0]
+
+    image = InputMediaPhoto(
+        media=banner.image,
+        caption=f"Вопрос: {question.question}\nОтвет: {question.answer}",
+    )
+
+    pagination_btns = pages(paginator)
+
+    kbds = get_questions_btns(
+        level=level,
+        page=page,
+        pagination_btns=pagination_btns,
     )
 
     return image, kbds
@@ -174,3 +196,5 @@ async def get_menu_content(
         return await precart(session, level, menu_name, page, product_id)
     elif level == 5:
         return await cart(session, level, menu_name, page, user_id, product_id)
+    elif level == 6:
+        return await questions(session, level, page)

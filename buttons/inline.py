@@ -17,7 +17,7 @@ def get_user_main_btns(*, level: int, sizes: tuple[int] = (2,)):
     btns = {
         "Каталог": "catalog",
         "Корзина": "cart",
-        "FAQ": "about",
+        "FAQ": "faq",
     }
     for text, menu_name in btns.items():
         if menu_name == 'catalog':
@@ -29,6 +29,9 @@ def get_user_main_btns(*, level: int, sizes: tuple[int] = (2,)):
         elif menu_name == 'cart':
             keyboard.add(InlineKeyboardButton(text=text,
                                               callback_data=MenuCallBack(level=5, menu_name=menu_name).pack()))
+        elif menu_name == 'faq':
+            keyboard.add(InlineKeyboardButton(text=text,
+                                              callback_data=MenuCallBack(level=6, menu_name=menu_name).pack()))
         else:
             keyboard.add(InlineKeyboardButton(text=text,
                                               callback_data=MenuCallBack(level=level, menu_name=menu_name).pack()))
@@ -63,8 +66,8 @@ def get_products_btns(
 ):
     keyboard = InlineKeyboardBuilder()
 
-    keyboard.add(InlineKeyboardButton(text='Назад',
-                                      callback_data=MenuCallBack(level=level - 1, menu_name='catalog').pack()))
+    keyboard.add(InlineKeyboardButton(text='В каталог',
+                                      callback_data=MenuCallBack(level=1, menu_name='catalog').pack()))
     keyboard.add(InlineKeyboardButton(text='Корзина',
                                       callback_data=MenuCallBack(level=5, menu_name='cart').pack()))
     keyboard.add(InlineKeyboardButton(text='Заказать',
@@ -89,6 +92,39 @@ def get_products_btns(
                                                 level=level,
                                                 menu_name=menu_name,
                                                 category=category,
+                                                page=page - 1).pack()))
+
+    return keyboard.row(*row).as_markup()
+
+
+def get_questions_btns(
+        *,
+        level: int,
+        page: int,
+        pagination_btns: dict,
+        sizes: tuple[int] = (2, 1)
+):
+    keyboard = InlineKeyboardBuilder()
+
+    keyboard.add(InlineKeyboardButton(text='На главную',
+                                      callback_data=MenuCallBack(level=0, menu_name='main').pack()))
+
+    keyboard.adjust(*sizes)
+
+    row = []
+    for text, menu_name in pagination_btns.items():
+        if menu_name == "next":
+            row.append(InlineKeyboardButton(text=text,
+                                            callback_data=MenuCallBack(
+                                                level=level,
+                                                menu_name=menu_name,
+                                                page=page + 1).pack()))
+
+        elif menu_name == "previous":
+            row.append(InlineKeyboardButton(text=text,
+                                            callback_data=MenuCallBack(
+                                                level=level,
+                                                menu_name=menu_name,
                                                 page=page - 1).pack()))
 
     return keyboard.row(*row).as_markup()

@@ -59,6 +59,9 @@ class Cart(Base):
     __tablename__ = 'cart'
 
     id: Mapped[int] = mapped_column(primary_key=True, autoincrement=True)
+    city: Mapped[str] = mapped_column(String(150), nullable=True)
+    address: Mapped[str] = mapped_column(String(150), nullable=True)
+    apartment_number: Mapped[int] = mapped_column(Integer, nullable=True)
     user_id: Mapped[int] = mapped_column(ForeignKey('user.user_id', ondelete='CASCADE'), nullable=False)
     product_id: Mapped[int] = mapped_column(ForeignKey('product.id', ondelete='CASCADE'), nullable=False)
     quantity: Mapped[int]
@@ -67,13 +70,9 @@ class Cart(Base):
     product: Mapped['Product'] = relationship(backref='cart')
 
 
-class Order(Base):
-    __tablename__ = 'order'
+class Question(Base):
+    __tablename__ = 'question'
 
     id: Mapped[int] = mapped_column(primary_key=True, autoincrement=True)
-    city: Mapped[str] = mapped_column(String(150), nullable=False)
-    address: Mapped[str] = mapped_column(String(150), nullable=False)
-    apartment_number: Mapped[int] = mapped_column(Integer, nullable=False)
-    cart_id: Mapped[int] = mapped_column(ForeignKey('cart.id', ondelete='CASCADE'), nullable=False)
-
-    cart: Mapped['Cart'] = relationship(backref='order')
+    question: Mapped[str] = mapped_column(String(150), nullable=True)
+    answer: Mapped[str] = mapped_column(String(150), nullable=True)

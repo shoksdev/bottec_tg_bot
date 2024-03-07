@@ -1,5 +1,7 @@
 from aiogram import F, types, Router
-from aiogram.filters import CommandStart
+from aiogram.filters import CommandStart, StateFilter
+from aiogram.fsm.context import FSMContext
+from aiogram.fsm.state import StatesGroup, State
 
 from sqlalchemy.ext.asyncio import AsyncSession
 from database.orm_queries import (
@@ -13,6 +15,12 @@ from buttons.inline import MenuCallBack, get_callback_btns
 
 user_private_router = Router()
 user_private_router.message.filter(ChatTypeFilter(["private"]))
+
+
+class AddShippingInfoToCart(StatesGroup):
+    city = State()
+    address = State()
+    apartment_number = State()
 
 
 @user_private_router.message(CommandStart())
