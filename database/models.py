@@ -1,4 +1,4 @@
-from sqlalchemy import DateTime, Float, String, Text, func, BigInteger, ForeignKey
+from sqlalchemy import DateTime, Float, String, Text, func, BigInteger, ForeignKey, Integer
 from sqlalchemy.orm import DeclarativeBase, Mapped, mapped_column, relationship
 
 
@@ -39,6 +39,7 @@ class Product(Base):
     id: Mapped[int] = mapped_column(primary_key=True, autoincrement=True)
     description: Mapped[str] = mapped_column(Text)
     image: Mapped[str] = mapped_column(String(150))
+    quantity: Mapped[int] = mapped_column(Integer, nullable=True, default=0)
 
     subcategory_id: Mapped[int] = mapped_column(ForeignKey('subcategory.id', ondelete='CASCADE'), nullable=False)
     subcategory: Mapped['SubCategory'] = relationship(backref='product')
@@ -64,3 +65,15 @@ class Cart(Base):
 
     user: Mapped['User'] = relationship(backref='cart')
     product: Mapped['Product'] = relationship(backref='cart')
+
+
+class Order(Base):
+    __tablename__ = 'order'
+
+    id: Mapped[int] = mapped_column(primary_key=True, autoincrement=True)
+    city: Mapped[str] = mapped_column(String(150), nullable=False)
+    address: Mapped[str] = mapped_column(String(150), nullable=False)
+    apartment_number: Mapped[int] = mapped_column(Integer, nullable=False)
+    cart_id: Mapped[int] = mapped_column(ForeignKey('cart.id', ondelete='CASCADE'), nullable=False)
+
+    cart: Mapped['Cart'] = relationship(backref='order')

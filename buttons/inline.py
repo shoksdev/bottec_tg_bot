@@ -9,6 +9,7 @@ class MenuCallBack(CallbackData, prefix="menu"):
     category: int | None = None
     page: int = 1
     product_id: int | None = None
+    quantity: int | None = None
 
 
 def get_user_main_btns(*, level: int, sizes: tuple[int] = (2,)):
@@ -19,12 +20,15 @@ def get_user_main_btns(*, level: int, sizes: tuple[int] = (2,)):
         "FAQ": "about",
     }
     for text, menu_name in btns.items():
-        if menu_name == 'catalog' or 'subcatalog':
+        if menu_name == 'catalog':
+            keyboard.add(InlineKeyboardButton(text=text,
+                                              callback_data=MenuCallBack(level=level + 1, menu_name=menu_name).pack()))
+        elif menu_name == 'subcatalog':
             keyboard.add(InlineKeyboardButton(text=text,
                                               callback_data=MenuCallBack(level=level + 1, menu_name=menu_name).pack()))
         elif menu_name == 'cart':
             keyboard.add(InlineKeyboardButton(text=text,
-                                              callback_data=MenuCallBack(level=4, menu_name=menu_name).pack()))
+                                              callback_data=MenuCallBack(level=5, menu_name=menu_name).pack()))
         else:
             keyboard.add(InlineKeyboardButton(text=text,
                                               callback_data=MenuCallBack(level=level, menu_name=menu_name).pack()))
@@ -38,7 +42,7 @@ def get_user_catalog_btns(*, level: int, categories: list, sizes: tuple[int] = (
     keyboard.add(InlineKeyboardButton(text='На главную',
                                       callback_data=MenuCallBack(level=0, menu_name='main').pack()))
     keyboard.add(InlineKeyboardButton(text='Корзина',
-                                      callback_data=MenuCallBack(level=4, menu_name='cart').pack()))
+                                      callback_data=MenuCallBack(level=5, menu_name='cart').pack()))
 
     for category in categories:
         keyboard.add(InlineKeyboardButton(text=category.name,
@@ -62,9 +66,9 @@ def get_products_btns(
     keyboard.add(InlineKeyboardButton(text='Назад',
                                       callback_data=MenuCallBack(level=level - 1, menu_name='catalog').pack()))
     keyboard.add(InlineKeyboardButton(text='Корзина',
-                                      callback_data=MenuCallBack(level=4, menu_name='cart').pack()))
+                                      callback_data=MenuCallBack(level=5, menu_name='cart').pack()))
     keyboard.add(InlineKeyboardButton(text='Заказать',
-                                      callback_data=MenuCallBack(level=level, menu_name='go_to_pre_cart',
+                                      callback_data=MenuCallBack(level=4, menu_name='precart',
                                                                  product_id=product_id).pack()))
 
     keyboard.adjust(*sizes)
@@ -115,9 +119,11 @@ def get_user_precart(
         row2 = [
             InlineKeyboardButton(text='На главную',
                                  callback_data=MenuCallBack(level=0, menu_name='main').pack()),
-            InlineKeyboardButton(text='Заказать',
+            InlineKeyboardButton(text='Подтвердить',
                                  callback_data=MenuCallBack(level=level, menu_name='add_to_cart',
-                                                            product_id=product_id).pack())
+                                                            product_id=product_id, quantity=page).pack()),
+            InlineKeyboardButton(text='Корзина',
+                                 callback_data=MenuCallBack(level=5, menu_name='cart').pack())
         ]
         return keyboard.row(*row2).as_markup()
     else:
@@ -140,12 +146,6 @@ def get_user_cart(
     if page:
         keyboard.add(InlineKeyboardButton(text='Удалить',
                                           callback_data=MenuCallBack(level=level, menu_name='delete',
-                                                                     product_id=product_id, page=page).pack()))
-        keyboard.add(InlineKeyboardButton(text='-1',
-                                          callback_data=MenuCallBack(level=level, menu_name='decrement',
-                                                                     product_id=product_id, page=page).pack()))
-        keyboard.add(InlineKeyboardButton(text='+1',
-                                          callback_data=MenuCallBack(level=level, menu_name='increment',
                                                                      product_id=product_id, page=page).pack()))
 
         keyboard.adjust(*sizes)
@@ -172,7 +172,7 @@ def get_user_cart(
         return keyboard.row(*row2).as_markup()
     else:
         keyboard.add(
-            InlineKeyboardButton(text='На главную 🏠',
+            InlineKeyboardButton(text='На главную',
                                  callback_data=MenuCallBack(level=0, menu_name='main').pack()))
 
         return keyboard.adjust(*sizes).as_markup()

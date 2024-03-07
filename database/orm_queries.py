@@ -173,16 +173,16 @@ async def orm_add_user(
 
 ######################## Работа с корзинами #######################################
 
-async def orm_add_to_cart(session: AsyncSession, user_id: int, product_id: int):
+async def orm_add_to_cart(session: AsyncSession, user_id: int, product_id: int, quantity: int):
     query = select(Cart).where(Cart.user_id == user_id, Cart.product_id == product_id).options(joinedload(Cart.product))
     cart = await session.execute(query)
     cart = cart.scalar()
     if cart:
-        cart.quantity += 1
+        cart.quantity += quantity
         await session.commit()
         return cart
     else:
-        session.add(Cart(user_id=user_id, product_id=product_id, quantity=1))
+        session.add(Cart(user_id=user_id, product_id=product_id, quantity=quantity))
         await session.commit()
 
 

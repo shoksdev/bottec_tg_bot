@@ -269,7 +269,6 @@ async def add_image(message: types.Message, state: FSMContext, session: AsyncSes
         await message.answer("Отправьте фото")
         return
     data = await state.get_data()
-    print(data)
     try:
         if AddProduct.product_for_change:
             await orm_update_product(session, AddProduct.product_for_change.id, data)

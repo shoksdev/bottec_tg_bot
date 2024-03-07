@@ -8,7 +8,7 @@ from database.orm_queries import (
     orm_get_categories,
     orm_get_products,
     orm_get_user_carts,
-    orm_reduce_product_in_cart, orm_get_subcategories,
+    orm_reduce_product_in_cart, orm_get_subcategories, orm_get_product,
 )
 from buttons.inline import (
     get_products_btns,
@@ -87,50 +87,25 @@ async def products(session, level, subcategory, page):
     return image, kbds
 
 
-async def precart(session, level, menu_name, page, user_id, product_id):
-    if menu_name == "delete":
-        await orm_delete_from_cart(session, user_id, product_id)
-        if page > 1:
+async def precart(session, level, menu_name, page, product_id):
+    product = (await orm_get_product(session, product_id))
+    if menu_name == "decrement":
+        if product.quantity > 1 or page > 1:
             page -= 1
-    elif menu_name == "decrement":
-        is_cart = await orm_reduce_product_in_cart(session, user_id, product_id)
-        if page > 1 and not is_cart:
-            page -= 1
+        else:
+            page = 0
     elif menu_name == "increment":
-        await orm_add_to_cart(session, user_id, product_id)
+        page += 1
 
-    carts = await orm_get_user_carts(session, user_id)
-
-    if not carts:
-        banner = await orm_get_banner(session, "cart")
-        image = InputMediaPhoto(
-            media=banner.image, caption=f"<strong>{banner.description}</strong>"
-        )
-
-        kbds = get_user_precart(
-            level=level,
-            page=None,
-            pagination_btns=None,
-            product_id=None,
-        )
-    else:
-        paginator = Paginator(carts, page=page)
-
-        cart = paginator.get_page()[0]
-
-        image = InputMediaPhoto(
-            media=cart.product.image,
-            caption=f"{cart.product.description}\n Товар {paginator.page} из {paginator.pages} в корзине."
-        )
-
-        pagination_btns = pages(paginator)
-
-        kbds = get_user_precart(
-            level=level,
-            page=page,
-            pagination_btns=pagination_btns,
-            product_id=cart.product.id,
-        )
+    image = InputMediaPhoto(
+        media=product.image,
+        caption=f"{product.description}\nКоличество: {page}"
+    )
+    kbds = get_user_precart(
+        level=level,
+        page=page,
+        product_id=product_id,
+    )
 
     return image, kbds
 
@@ -140,12 +115,6 @@ async def cart(session, level, menu_name, page, user_id, product_id):
         await orm_delete_from_cart(session, user_id, product_id)
         if page > 1:
             page -= 1
-    elif menu_name == "decrement":
-        is_cart = await orm_reduce_product_in_cart(session, user_id, product_id)
-        if page > 1 and not is_cart:
-            page -= 1
-    elif menu_name == "increment":
-        await orm_add_to_cart(session, user_id, product_id)
 
     carts = await orm_get_user_carts(session, user_id)
 
@@ -168,7 +137,8 @@ async def cart(session, level, menu_name, page, user_id, product_id):
 
         image = InputMediaPhoto(
             media=cart.product.image,
-            caption=f"{cart.product.description}\n Товар {paginator.page} из {paginator.pages} в корзине."
+            caption=f"{cart.product.description}\nКоличество: {cart.quantity}"
+                    f"\nТовар {paginator.page} из {paginator.pages} в корзине."
         )
 
         pagination_btns = pages(paginator)
@@ -201,6 +171,6 @@ async def get_menu_content(
     elif level == 3:
         return await products(session, level, category, page)
     elif level == 4:
-        return await precart(session, level, menu_name, page, user_id, product_id)
+        return await precart(session, level, menu_name, page, product_id)
     elif level == 5:
         return await cart(session, level, menu_name, page, user_id, product_id)
