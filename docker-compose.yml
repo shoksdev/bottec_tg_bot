@@ -1,33 +1,5 @@
 version: '3.7'
 
-#services:
-#  telegram:
-#    build: .
-#    command: python app.py
-#    volumes:
-#      - .:/usr/src/work_tg_bot/
-#    env_file:
-#      - .env
-#    depends_on:
-#      - db
-#    networks:
-#      - botnet
-#  db:
-#    image: postgres
-#    volumes:
-#      - postgres_data:/var/lib/postgresql/data/
-#    env_file:
-#      - .env
-#    ports:
-#      - 5432:5432
-#
-#volumes:
-#  postgres_data:
-#
-#networks:
-#  botnet:
-#    driver: bridge
-
 
 services:
   db:
@@ -55,12 +27,9 @@ services:
       - .env
     volumes:
       - .:/src
-    # Бот стартует после запуска базы
     depends_on:
       - db
 
-# указываются используемые сети
 networks:
   botnet:
-    # указывается драйвер сети
     driver: bridge

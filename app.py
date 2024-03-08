@@ -1,9 +1,9 @@
 import asyncio
 import os
 
-from aiogram import Bot, Dispatcher, types
+from aiogram import Bot, Dispatcher
 from aiogram.client.default import DefaultBotProperties
-from aiogram.enums import ParseMode, ContentType
+from aiogram.enums import ParseMode
 
 from dotenv import find_dotenv, load_dotenv
 

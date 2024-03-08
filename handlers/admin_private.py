@@ -11,7 +11,6 @@ from database.orm_queries import (
     orm_get_categories,
     orm_add_product,
     orm_get_info_pages,
-    orm_get_product,
     orm_update_product, orm_get_subcategories,
 )
 from filters.chat_types import ChatTypeFilter
