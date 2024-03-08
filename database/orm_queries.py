@@ -9,6 +9,7 @@ from database.models import Banner, Cart, Category, Product, User, SubCategory, 
 
 class Paginator:
     """Простенький пагинатор"""
+
     def __init__(self, array: list | tuple, page: int = 1, per_page: int = 1):
         self.array = array
         self.per_page = per_page

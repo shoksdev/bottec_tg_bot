@@ -9,6 +9,7 @@ load_dotenv(find_dotenv())
 
 class ChatTypeFilter(Filter):
     """Регулируем типы чатов"""
+
     def __init__(self, chat_types: list[str]) -> None:
         self.chat_types = chat_types
 
@@ -18,6 +19,7 @@ class ChatTypeFilter(Filter):
 
 class UserInGroupAndChannelFilter(Filter):
     """Проверяем на то, подписан пользователь на группу и канал"""
+
     def __init__(self, bot: Bot) -> None:
         self.bot = bot
 

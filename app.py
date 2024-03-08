@@ -4,7 +4,6 @@ import os
 from aiogram import Bot, Dispatcher
 from aiogram.client.default import DefaultBotProperties
 from aiogram.enums import ParseMode
-
 from dotenv import find_dotenv, load_dotenv
 
 from filters.chat_types import ChatTypeFilter, UserInGroupAndChannelFilter
@@ -17,7 +16,6 @@ from middleware.database_middlewares import DataBaseSession
 from database.database_engine import create_db, session_maker
 
 from handlers.user_private import user_private_router
-
 
 bot = Bot(token=os.getenv('TELEGRAM_TOKEN'), default=DefaultBotProperties(parse_mode=ParseMode.HTML))
 
