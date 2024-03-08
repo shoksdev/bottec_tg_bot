@@ -6,7 +6,7 @@ from database.menu_steps import categories, info_pages, subcategories
 from database.models import Base
 from database.orm_queries import orm_create_categories, orm_add_banner_description, orm_create_subcategories
 
-engine = create_async_engine(os.getenv('SQLITE_ENGINE'), echo=True)
+engine = create_async_engine(os.getenv('DATABASE_ENGINE'), echo=True)
 
 session_maker = async_sessionmaker(bind=engine, class_=AsyncSession, expire_on_commit=False)
 
