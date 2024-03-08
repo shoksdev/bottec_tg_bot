@@ -1,13 +1,15 @@
-from sqlalchemy import DateTime, Float, String, Text, func, BigInteger, ForeignKey, Integer
+from sqlalchemy import DateTime, String, Text, func, BigInteger, ForeignKey, Integer
 from sqlalchemy.orm import DeclarativeBase, Mapped, mapped_column, relationship
 
 
 class Base(DeclarativeBase):
+    """Базовая модель"""
     created: Mapped[DateTime] = mapped_column(DateTime, default=func.now())
     updated: Mapped[DateTime] = mapped_column(DateTime, default=func.now(), onupdate=func.now())
 
 
 class Banner(Base):
+    """Модель баннеров"""
     __tablename__ = 'banner'
 
     id: Mapped[int] = mapped_column(primary_key=True, autoincrement=True)
@@ -17,6 +19,7 @@ class Banner(Base):
 
 
 class Category(Base):
+    """Модель категорий"""
     __tablename__ = 'category'
 
     id: Mapped[int] = mapped_column(primary_key=True, autoincrement=True)
@@ -24,6 +27,7 @@ class Category(Base):
 
 
 class SubCategory(Base):
+    """Модель подкатегорий"""
     __tablename__ = 'subcategory'
 
     id: Mapped[int] = mapped_column(primary_key=True, autoincrement=True)
@@ -34,6 +38,7 @@ class SubCategory(Base):
 
 
 class Product(Base):
+    """Модель товаров"""
     __tablename__ = 'product'
 
     id: Mapped[int] = mapped_column(primary_key=True, autoincrement=True)
@@ -46,6 +51,7 @@ class Product(Base):
 
 
 class User(Base):
+    """Модель пользователей"""
     __tablename__ = 'user'
 
     id: Mapped[int] = mapped_column(primary_key=True, autoincrement=True)
@@ -56,6 +62,7 @@ class User(Base):
 
 
 class Cart(Base):
+    """Модель корзин"""
     __tablename__ = 'cart'
 
     id: Mapped[int] = mapped_column(primary_key=True, autoincrement=True)
@@ -71,6 +78,7 @@ class Cart(Base):
 
 
 class Question(Base):
+    """Модель вопросов (FAQ)"""
     __tablename__ = 'question'
 
     id: Mapped[int] = mapped_column(primary_key=True, autoincrement=True)
